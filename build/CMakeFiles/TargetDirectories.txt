@@ -1,0 +1,7 @@
+/home/user/projects/softracker/build/CMakeFiles/install.dir
+/home/user/projects/softracker/build/CMakeFiles/list_install_components.dir
+/home/user/projects/softracker/build/CMakeFiles/rebuild_cache.dir
+/home/user/projects/softracker/build/CMakeFiles/softracker.dir
+/home/user/projects/softracker/build/CMakeFiles/install/strip.dir
+/home/user/projects/softracker/build/CMakeFiles/install/local.dir
+/home/user/projects/softracker/build/CMakeFiles/edit_cache.dir

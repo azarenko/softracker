@@ -1,0 +1,1 @@
+/usr/bin/cc  -g   CMakeFiles/softracker.dir/main.c.o CMakeFiles/softracker.dir/cmdparam.c.o CMakeFiles/softracker.dir/settings.c.o CMakeFiles/softracker.dir/sockutils.c.o CMakeFiles/softracker.dir/fifo.c.o  -o softracker -rdynamic -levent -lpthread -lconfig -lpq 
