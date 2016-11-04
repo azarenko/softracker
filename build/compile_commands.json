@@ -21,7 +21,12 @@
 },
 {
   "directory": "/home/user/projects/softracker/build",
-  "command": "/usr/bin/cc   -I/usr/include/postgresql  -g   -o CMakeFiles/softracker.dir/fifo.c.o   -c /home/user/projects/softracker/fifo.c",
-  "file": "/home/user/projects/softracker/fifo.c"
+  "command": "/usr/bin/cc   -I/usr/include/postgresql  -g   -o CMakeFiles/softracker.dir/proto.c.o   -c /home/user/projects/softracker/proto.c",
+  "file": "/home/user/projects/softracker/proto.c"
+},
+{
+  "directory": "/home/user/projects/softracker/build",
+  "command": "/usr/bin/cc   -I/usr/include/postgresql  -g   -o CMakeFiles/softracker.dir/cJSON.c.o   -c /home/user/projects/softracker/cJSON.c",
+  "file": "/home/user/projects/softracker/cJSON.c"
 }
 ]

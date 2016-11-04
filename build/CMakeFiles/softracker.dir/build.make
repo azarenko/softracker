@@ -153,28 +153,52 @@ CMakeFiles/softracker.dir/sockutils.c.o.provides: CMakeFiles/softracker.dir/sock
 CMakeFiles/softracker.dir/sockutils.c.o.provides.build: CMakeFiles/softracker.dir/sockutils.c.o
 
 
-CMakeFiles/softracker.dir/fifo.c.o: CMakeFiles/softracker.dir/flags.make
-CMakeFiles/softracker.dir/fifo.c.o: ../fifo.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/projects/softracker/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/softracker.dir/fifo.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/softracker.dir/fifo.c.o   -c /home/user/projects/softracker/fifo.c
+CMakeFiles/softracker.dir/proto.c.o: CMakeFiles/softracker.dir/flags.make
+CMakeFiles/softracker.dir/proto.c.o: ../proto.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/projects/softracker/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/softracker.dir/proto.c.o"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/softracker.dir/proto.c.o   -c /home/user/projects/softracker/proto.c
 
-CMakeFiles/softracker.dir/fifo.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/softracker.dir/fifo.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/projects/softracker/fifo.c > CMakeFiles/softracker.dir/fifo.c.i
+CMakeFiles/softracker.dir/proto.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/softracker.dir/proto.c.i"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/projects/softracker/proto.c > CMakeFiles/softracker.dir/proto.c.i
 
-CMakeFiles/softracker.dir/fifo.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/softracker.dir/fifo.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/projects/softracker/fifo.c -o CMakeFiles/softracker.dir/fifo.c.s
+CMakeFiles/softracker.dir/proto.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/softracker.dir/proto.c.s"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/projects/softracker/proto.c -o CMakeFiles/softracker.dir/proto.c.s
 
-CMakeFiles/softracker.dir/fifo.c.o.requires:
+CMakeFiles/softracker.dir/proto.c.o.requires:
 
-.PHONY : CMakeFiles/softracker.dir/fifo.c.o.requires
+.PHONY : CMakeFiles/softracker.dir/proto.c.o.requires
 
-CMakeFiles/softracker.dir/fifo.c.o.provides: CMakeFiles/softracker.dir/fifo.c.o.requires
-	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/fifo.c.o.provides.build
-.PHONY : CMakeFiles/softracker.dir/fifo.c.o.provides
+CMakeFiles/softracker.dir/proto.c.o.provides: CMakeFiles/softracker.dir/proto.c.o.requires
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/proto.c.o.provides.build
+.PHONY : CMakeFiles/softracker.dir/proto.c.o.provides
 
-CMakeFiles/softracker.dir/fifo.c.o.provides.build: CMakeFiles/softracker.dir/fifo.c.o
+CMakeFiles/softracker.dir/proto.c.o.provides.build: CMakeFiles/softracker.dir/proto.c.o
+
+
+CMakeFiles/softracker.dir/cJSON.c.o: CMakeFiles/softracker.dir/flags.make
+CMakeFiles/softracker.dir/cJSON.c.o: ../cJSON.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/projects/softracker/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/softracker.dir/cJSON.c.o"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/softracker.dir/cJSON.c.o   -c /home/user/projects/softracker/cJSON.c
+
+CMakeFiles/softracker.dir/cJSON.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/softracker.dir/cJSON.c.i"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/projects/softracker/cJSON.c > CMakeFiles/softracker.dir/cJSON.c.i
+
+CMakeFiles/softracker.dir/cJSON.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/softracker.dir/cJSON.c.s"
+	/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/projects/softracker/cJSON.c -o CMakeFiles/softracker.dir/cJSON.c.s
+
+CMakeFiles/softracker.dir/cJSON.c.o.requires:
+
+.PHONY : CMakeFiles/softracker.dir/cJSON.c.o.requires
+
+CMakeFiles/softracker.dir/cJSON.c.o.provides: CMakeFiles/softracker.dir/cJSON.c.o.requires
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/cJSON.c.o.provides.build
+.PHONY : CMakeFiles/softracker.dir/cJSON.c.o.provides
+
+CMakeFiles/softracker.dir/cJSON.c.o.provides.build: CMakeFiles/softracker.dir/cJSON.c.o
 
 
 # Object files for target softracker
@@ -183,7 +207,8 @@ softracker_OBJECTS = \
 "CMakeFiles/softracker.dir/cmdparam.c.o" \
 "CMakeFiles/softracker.dir/settings.c.o" \
 "CMakeFiles/softracker.dir/sockutils.c.o" \
-"CMakeFiles/softracker.dir/fifo.c.o"
+"CMakeFiles/softracker.dir/proto.c.o" \
+"CMakeFiles/softracker.dir/cJSON.c.o"
 
 # External object files for target softracker
 softracker_EXTERNAL_OBJECTS =
@@ -192,10 +217,11 @@ softracker: CMakeFiles/softracker.dir/main.c.o
 softracker: CMakeFiles/softracker.dir/cmdparam.c.o
 softracker: CMakeFiles/softracker.dir/settings.c.o
 softracker: CMakeFiles/softracker.dir/sockutils.c.o
-softracker: CMakeFiles/softracker.dir/fifo.c.o
+softracker: CMakeFiles/softracker.dir/proto.c.o
+softracker: CMakeFiles/softracker.dir/cJSON.c.o
 softracker: CMakeFiles/softracker.dir/build.make
 softracker: CMakeFiles/softracker.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/projects/softracker/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable softracker"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/projects/softracker/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking C executable softracker"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/softracker.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -207,7 +233,8 @@ CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/main.c.o.requires
 CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/cmdparam.c.o.requires
 CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/settings.c.o.requires
 CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/sockutils.c.o.requires
-CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/fifo.c.o.requires
+CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/proto.c.o.requires
+CMakeFiles/softracker.dir/requires: CMakeFiles/softracker.dir/cJSON.c.o.requires
 
 .PHONY : CMakeFiles/softracker.dir/requires
 

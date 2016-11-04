@@ -22,7 +22,9 @@
 #include "cmdparam.h"
 #include "settings.h"
 #include "sockutils.h"
-#include "fifo.h"
+#include "proto.h"
+
+#define MAX_CONTENT_LEN 1024 * 512
 
 /*
  * Terminate server
@@ -89,19 +91,59 @@ void* httpserver_Dispatch(void *arg) {
 }
  
 void httpserver_ProcessRequest(struct evhttp_request *req) {
-    struct evbuffer *evb = evbuffer_new();
-    if (evb == NULL) return;
-  
     
+    struct evbuffer *inbuff;    
+    char content[MAX_CONTENT_LEN];
+    int contentLen = 0;
+    bzero(content, MAX_CONTENT_LEN);
     
-      // Set HTTP headers    
+    inbuff = evhttp_request_get_input_buffer(req);    
+	while (evbuffer_get_length(inbuff)) 
+    {
+		contentLen += evbuffer_remove(inbuff, content + contentLen, 128);		
+    }
+    
+    char* outPacketId;  
+    struct evbuffer *outbuff = evbuffer_new();
+    
+    int isgood = contentLen > 0;    
+    isgood = proto(content, contentLen, &outPacketId) == EXIT_SUCCESS;        
+    
+    if(isgood)
+    {
+         evbuffer_add_printf(outbuff,
+            "{\"id\":\"%s\",\n"
+            "\"error_code\":\"0\",\n"
+            "\"error_message\":\"\"}", outPacketId);
+    }
+    else
+    {
+           evbuffer_add_printf(outbuff,
+            "{\"id\":\"%s\",\n"
+            "\"error_code\":\"103\",\n"
+            "\"error_message\":\"failed to parse data\"}", outPacketId);  
+    }
+        
+    char outcontentLengthStr[3];
+    sprintf(outcontentLengthStr, "%zu", evbuffer_get_length(outbuff));
+    
+    // Set HTTP headers    
+    evhttp_add_header(req->output_headers, "Content-Type", "application/json");
     evhttp_add_header(req->output_headers, "Connection", "close");
+    evhttp_add_header(req->output_headers, "Content-Length", outcontentLengthStr);
 
     // Send reply
-    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    if(isgood)
+    {
+        evhttp_send_reply(req, HTTP_OK, "OK", outbuff);
+    }
+    else
+    {
+        evhttp_send_reply(req, HTTP_INTERNAL, "ERROR", outbuff);
+    }
 
     // Free memory
-    evbuffer_free(evb);
+    evbuffer_free(outbuff);    
 }
  
 void httpserver_GenericHandler(struct evhttp_request *req, void *arg) {

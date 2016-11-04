@@ -167,6 +167,33 @@ softracker/fast:
 	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/build
 .PHONY : softracker/fast
 
+cJSON.o: cJSON.c.o
+
+.PHONY : cJSON.o
+
+# target to build an object file
+cJSON.c.o:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/cJSON.c.o
+.PHONY : cJSON.c.o
+
+cJSON.i: cJSON.c.i
+
+.PHONY : cJSON.i
+
+# target to preprocess a source file
+cJSON.c.i:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/cJSON.c.i
+.PHONY : cJSON.c.i
+
+cJSON.s: cJSON.c.s
+
+.PHONY : cJSON.s
+
+# target to generate assembly for a file
+cJSON.c.s:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/cJSON.c.s
+.PHONY : cJSON.c.s
+
 cmdparam.o: cmdparam.c.o
 
 .PHONY : cmdparam.o
@@ -194,33 +221,6 @@ cmdparam.c.s:
 	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/cmdparam.c.s
 .PHONY : cmdparam.c.s
 
-fifo.o: fifo.c.o
-
-.PHONY : fifo.o
-
-# target to build an object file
-fifo.c.o:
-	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/fifo.c.o
-.PHONY : fifo.c.o
-
-fifo.i: fifo.c.i
-
-.PHONY : fifo.i
-
-# target to preprocess a source file
-fifo.c.i:
-	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/fifo.c.i
-.PHONY : fifo.c.i
-
-fifo.s: fifo.c.s
-
-.PHONY : fifo.s
-
-# target to generate assembly for a file
-fifo.c.s:
-	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/fifo.c.s
-.PHONY : fifo.c.s
-
 main.o: main.c.o
 
 .PHONY : main.o
@@ -247,6 +247,33 @@ main.s: main.c.s
 main.c.s:
 	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/main.c.s
 .PHONY : main.c.s
+
+proto.o: proto.c.o
+
+.PHONY : proto.o
+
+# target to build an object file
+proto.c.o:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/proto.c.o
+.PHONY : proto.c.o
+
+proto.i: proto.c.i
+
+.PHONY : proto.i
+
+# target to preprocess a source file
+proto.c.i:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/proto.c.i
+.PHONY : proto.c.i
+
+proto.s: proto.c.s
+
+.PHONY : proto.s
+
+# target to generate assembly for a file
+proto.c.s:
+	$(MAKE) -f CMakeFiles/softracker.dir/build.make CMakeFiles/softracker.dir/proto.c.s
+.PHONY : proto.c.s
 
 settings.o: settings.c.o
 
@@ -315,15 +342,18 @@ help:
 	@echo "... install/strip"
 	@echo "... install/local"
 	@echo "... edit_cache"
+	@echo "... cJSON.o"
+	@echo "... cJSON.i"
+	@echo "... cJSON.s"
 	@echo "... cmdparam.o"
 	@echo "... cmdparam.i"
 	@echo "... cmdparam.s"
-	@echo "... fifo.o"
-	@echo "... fifo.i"
-	@echo "... fifo.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... proto.o"
+	@echo "... proto.i"
+	@echo "... proto.s"
 	@echo "... settings.o"
 	@echo "... settings.i"
 	@echo "... settings.s"

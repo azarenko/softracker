@@ -4,9 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/home/user/projects/softracker/cJSON.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/cJSON.c.o"
   "/home/user/projects/softracker/cmdparam.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/cmdparam.c.o"
-  "/home/user/projects/softracker/fifo.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/fifo.c.o"
   "/home/user/projects/softracker/main.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/main.c.o"
+  "/home/user/projects/softracker/proto.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/proto.c.o"
   "/home/user/projects/softracker/settings.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/settings.c.o"
   "/home/user/projects/softracker/sockutils.c" "/home/user/projects/softracker/build/CMakeFiles/softracker.dir/sockutils.c.o"
   )

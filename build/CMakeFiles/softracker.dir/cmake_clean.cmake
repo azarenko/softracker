@@ -3,7 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/softracker.dir/cmdparam.c.o"
   "CMakeFiles/softracker.dir/settings.c.o"
   "CMakeFiles/softracker.dir/sockutils.c.o"
-  "CMakeFiles/softracker.dir/fifo.c.o"
+  "CMakeFiles/softracker.dir/proto.c.o"
+  "CMakeFiles/softracker.dir/cJSON.c.o"
   "softracker.pdb"
   "softracker"
 )
