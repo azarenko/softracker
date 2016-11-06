@@ -1,4 +1,17 @@
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <libpq-fe.h>
+
+#include "settings.h"
 #include "cJSON.h"
+
+const PGconn** connections;
+pthread_mutex_t* selectconnectionlock;
+unsigned long int connectionIndex;
 
 typedef struct DevicePoint
 {
@@ -18,10 +31,22 @@ typedef struct DevicePoint
     char* connected;
     char* battary;
     long int lastcharge_ts;
+    char *client_ip;
+    unsigned short client_port;
 } DevicePoint;
 
-int proto(char* reqdata, int len, const char** outPacketId);
+int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, unsigned short client_port);
 
 int savepoint(DevicePoint *dp);
 
-int parsepoint(cJSON* point);
+int parsepoint(cJSON* point, char *client_ip, unsigned short client_port);
+
+int db_login(PGconn **conn);
+
+int execsql(PGconn *conn, char *sql, char *report);
+
+PGresult *getexecsql(PGconn *conn, char * sql);
+
+void clearres(PGconn *conn, PGresult *res);
+
+PGconn* getConnection(void);

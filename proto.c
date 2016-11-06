@@ -18,11 +18,25 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <semaphore.h>
+#include <pthread.h>
+#include <time.h>
 
 #include "proto.h"
 #include "settings.h"
 
-int proto(char* reqdata, int len, const char** outPacketId)
+#define MAXLENQUERY     2048
+#define REPORTLEN       256
+#define POCKETMAXLEN    1500
+#define MAXCHIELDS      4096
+#define FD_COPY(f, t)   (void)(*(t) = *(f))
+#define INITPACKETLEN 17
+#define SERIALIZESENSORLEN 2048
+
+#define DECL  "DECLARE mycursor CURSOR FOR "
+#define FETCH "FETCH ALL in mycursor"
+#define CLOSE "CLOSE mycursor"
+
+int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, unsigned short client_port)
 {
     cJSON *root = cJSON_Parse(reqdata);
     
@@ -47,7 +61,7 @@ int proto(char* reqdata, int len, const char** outPacketId)
     if(data->type == cJSON_String)
     {
         cJSON *point = cJSON_Parse(data->valuestring);        
-        return parsepoint(point);
+        return parsepoint(point, client_ip, client_port);
     }
     
     if(data->type == cJSON_Array)
@@ -57,7 +71,7 @@ int proto(char* reqdata, int len, const char** outPacketId)
         for(i = 0; i < length; i++)
         {
             cJSON * subitem = cJSON_GetArrayItem(data, i);
-            if(parsepoint(subitem) == EXIT_FAILURE)
+            if(parsepoint(subitem, client_ip, client_port) == EXIT_FAILURE)
             {
                 return EXIT_FAILURE;
             }
@@ -67,10 +81,13 @@ int proto(char* reqdata, int len, const char** outPacketId)
     return EXIT_SUCCESS;
 }
 
-int parsepoint(cJSON* point)
+int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
 {
     DevicePoint dp;
-        
+    
+        dp.client_ip = client_ip;
+        dp.client_port = client_port;
+    
         cJSON* device_id = cJSON_GetObjectItem(point, "device_id");
         if(device_id == NULL)
         {
@@ -208,7 +225,238 @@ int parsepoint(cJSON* point)
         return savepoint(&dp);
 }
 
+int db_login(PGconn **conn)
+{    
+    if (PQstatus(*conn) == CONNECTION_BAD) 
+    {
+        char *pgoptions=NULL, *pgtty=NULL;
+        *conn = PQsetdbLogin(primarypghost, primarypgport, pgoptions, pgtty, primarydbname, primarypglogin, primarypgpwd);
+        if (PQstatus(*conn) == CONNECTION_BAD) 
+        { 
+            if(debug>1)syslog(LOG_ERR,"Connection to database failed %s", PQerrorMessage(*conn));
+            PQfinish(*conn);
+                        
+            *conn = PQsetdbLogin(secondarypghost, secondarypgport, pgoptions, pgtty, secondarydbname, secondarypglogin, secondarypgpwd);
+            
+            if (PQstatus(*conn) == CONNECTION_BAD) 
+            { 
+                if(debug>1)syslog(LOG_ERR,"Connection to database failed %s", PQerrorMessage(*conn));
+                PQfinish(*conn);
+                return 0;
+            }
+        }        
+        return 1;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+int execsql(PGconn *conn, char *sql, char *report)
+{
+    if (PQstatus(conn) == CONNECTION_BAD) 
+    {
+        return (2);
+    }
+    
+    PGresult   *res;
+
+    res = PQexec(conn, "BEGIN");
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+        if(debug)syslog(LOG_ERR,"BEGIN command failed");
+        strncpy(report, PQerrorMessage(conn),99);
+        PQclear(res);
+        return (1);
+    }
+    if(debug>1)syslog(LOG_ERR,"BEGIN command ok");
+
+    PQclear(res);
+    res = PQexec(conn, sql);
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+        if(debug)syslog(LOG_ERR,"PQexec command failed");
+        strncpy(report, PQerrorMessage(conn),99);
+        PQclear(res);
+        return (2);
+    }
+    if(debug>1)syslog(LOG_ERR,"PQexec command ok");
+
+    PQclear(res);
+    res = PQexec(conn, "COMMIT");
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) { 
+        if(debug)syslog(LOG_ERR,"COMMIT command failed");
+        strncpy(report, PQerrorMessage(conn),99);
+        PQclear(res);
+        return (3);
+    }
+    PQclear(res);
+    if(debug>1)syslog(LOG_ERR,"COMMIT command ok");
+    return (0); 
+}
+
+PGresult *getexecsql(PGconn *conn, char * sql)
+{   
+    if (PQstatus(conn) == CONNECTION_BAD) 
+    {
+        return NULL;
+    }
+    
+    char       *sqlfull;
+    int        sqllen;
+    PGresult   *res;
+    
+    res = PQexec(conn, "BEGIN");
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK){ 
+            if(debug)syslog(LOG_ERR,"BEGIN failed");
+            PQclear(res);
+            return res;
+    }
+    PQclear(res);
+    if(debug>1)syslog(LOG_ERR,"BEGIN ok");
+
+    sqllen=strlen(DECL);              sqllen+=strlen(sql);
+    sqlfull=(char*)malloc(sqllen+1);  memset(sqlfull, 0x00, sqllen+1);
+    strcpy(sqlfull, DECL);            strncat(sqlfull, sql, strlen(sql)); 
+    if(debug>3)syslog(LOG_ERR,"%s",sqlfull);
+    res = PQexec(conn, sqlfull);
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK){
+        if(debug)syslog(LOG_ERR,"DECLARE failed");
+        PQclear(res);
+        return res;
+    }
+    PQclear(res);
+    free(sqlfull);
+    if(debug>1)syslog(LOG_ERR,"DECLARE ok");
+
+    res = PQexec(conn, FETCH);
+    if (!res || PQresultStatus(res) != PGRES_TUPLES_OK){
+        if(debug)syslog(LOG_ERR,"FETCH failed");
+        PQclear(res);
+        return res;
+    }
+    if(debug>1)syslog(LOG_ERR,"FETCH ok");
+    return res;
+}
+
+void clearres(PGconn *conn, PGresult *res)
+{
+    if (PQstatus(conn) == CONNECTION_BAD) 
+    {
+        return;
+    }
+    
+    PQclear(res);
+    res = PQexec(conn, CLOSE);
+    if(debug>1)syslog(LOG_ERR,"CLOSE ok");
+    PQclear(res);
+    res = PQexec(conn, "COMMIT");
+    if(debug>1)syslog(LOG_ERR,"COMMIT ok");
+    PQclear(res);    
+} 
+
 int savepoint(DevicePoint *dp)
 {
+    int ret, num, ifexit;
+    char id[sizeof(long)+1];
+    PGresult *res;    
+       
+    int connectionId = connectionIndex++ % CONNECTION_BACKLOG;
+    
+    pthread_mutex_lock(&selectconnectionlock[connectionId]);
+    PGconn* conn = connections[connectionId];
+    
+    if (PQstatus(conn) == CONNECTION_BAD) 
+    {
+        conn = NULL;
+        if(db_login(&conn) == 0)
+        {
+            pthread_mutex_unlock(&selectconnectionlock[connectionId]);
+            return EXIT_FAILURE;
+        }
+    }
+    
+    char query[MAXLENQUERY];
+    bzero(query,MAXLENQUERY);
+    
+    ret = sprintf(query,"SELECT * FROM public.deviceauth('%s', '', '%s', %d, 24);", dp->device_id, dp->client_ip, dp->client_port);
+    
+    res = getexecsql(conn, query);
+    if(res)
+    {
+        if (PQgetisnull(res,0,0))
+        {
+            sprintf(id,"0");
+            ifexit=1;
+            if(debug>1)syslog(LOG_ERR,"getexec sql id not found ");
+            } 
+            else 
+            {
+                ret = sprintf(id,"%s",PQgetvalue(res, 0, 0));
+                ifexit=0;
+                if(debug>1)syslog(LOG_ERR,"getexec sql found id=%s",id);
+            }         
+    }
+    clearres(conn, res);
+    
+    if(ifexit)
+    {
+        pthread_mutex_unlock(&selectconnectionlock[connectionId]);
+        return EXIT_FAILURE;
+    }
+    
+    bzero(query,MAXLENQUERY);
+    ret = sprintf(query,
+    "SELECT public.device24save(\
+    24::bigint,\
+    %s::bigint,\
+    %lu::bigint,\
+    %f::double precision,\
+    %f::double precision,\
+    %d::real,\
+    %d::integer,\
+    %d::smallint,\
+    0::smallint,\
+    %d::smallint,\
+    %d::smallint,\
+    %s::smallint,\
+    %s::integer,\
+    0::bigint,\
+    ''::text,\
+    FALSE,\
+    ARRAY[0,0,%d%s]::double precision[],\
+    ARRAY[]::text[]\
+    );",
+                 id,                 
+                 dp->datetime_ts,
+                 dp->latitude,
+                 dp->longitude,
+                 dp->speed, 
+                 0,
+                 dp->altitude,
+                 dp->nsat, 
+                 dp->accuracy,
+                 dp->gprs,
+                 dp->battary,
+                 0,
+                 ""
+                );
+
+    if(debug)syslog(LOG_ERR,"query: %s",query);
+        
+    res = getexecsql(conn, query);
+    if(res)
+    {
+        if (PQgetisnull(res,0,0))
+        {
+                if(debug)syslog(LOG_WARNING,"can't insert track record errno %d",ret);
+                if(debug>1)syslog(LOG_WARNING,"%s",query);
+        }
+        else 
+        {            
+        }         
+    }
+    clearres(conn, res); 
+    
+    pthread_mutex_unlock(&selectconnectionlock[connectionId]);
     return EXIT_SUCCESS;
 }

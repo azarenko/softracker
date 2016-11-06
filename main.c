@@ -18,6 +18,7 @@
 #include <locale.h>
 #include <evhttp.h>
 #include <event2/bufferevent.h>
+#include <libpq-fe.h>
 
 #include "cmdparam.h"
 #include "settings.h"
@@ -106,8 +107,13 @@ void httpserver_ProcessRequest(struct evhttp_request *req) {
     char* outPacketId;  
     struct evbuffer *outbuff = evbuffer_new();
     
+    char *client_ip;
+    unsigned short client_port;
+
+    evhttp_connection_get_peer(evhttp_request_get_connection(req), &client_ip, &client_port);
+    
     int isgood = contentLen > 0;    
-    isgood = proto(content, contentLen, &outPacketId) == EXIT_SUCCESS;        
+    isgood = proto(content, contentLen, &outPacketId, client_ip, client_port) == EXIT_SUCCESS;        
     
     if(isgood)
     {
@@ -174,6 +180,8 @@ int httpserver_start(int port, int nthreads, int backlog)
 
 int main(int argc, char **argv)
 {
+    srand(time(NULL));
+    
     setlocale(LC_ALL, "UTF-8");
     /*
      * init syslog
@@ -209,7 +217,18 @@ int main(int argc, char **argv)
 	};
 	sigaction(SIGHUP, &siginfo, NULL);
 	sigaction(SIGTERM, &siginfo, NULL);
-
+    
+    connections = (PGconn**)malloc(sizeof(PGconn*) * CONNECTION_BACKLOG);
+    selectconnectionlock = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * CONNECTION_BACKLOG);
+    
+    int i;
+    for(i = 0; i < CONNECTION_BACKLOG; i++)
+    {
+        connections[i] = NULL;
+        db_login(&connections[i]);
+        pthread_mutex_init(&selectconnectionlock[i], NULL);
+    }
+    
     if(httpserver_start(port, CONNECTION_BACKLOG, CONNECTION_BACKLOG) == -1)
     {
         syslog(LOG_ERR, "Failed to start server");
@@ -217,6 +236,8 @@ int main(int argc, char **argv)
     }
   
   exit:
+    free(connections);
+    free(selectconnectionlock);
     syslog(LOG_INFO, "Stoping.");
     config_destroy(&cfg);
     closelog();    

@@ -13,6 +13,9 @@ CMakeFiles/softracker.dir/main.c.o: ../main.c
 CMakeFiles/softracker.dir/main.c.o: ../proto.h
 CMakeFiles/softracker.dir/main.c.o: ../settings.h
 CMakeFiles/softracker.dir/main.c.o: ../sockutils.h
+CMakeFiles/softracker.dir/main.c.o: /usr/include/postgresql/libpq-fe.h
+CMakeFiles/softracker.dir/main.c.o: /usr/include/postgresql/pg_config_ext.h
+CMakeFiles/softracker.dir/main.c.o: /usr/include/postgresql/postgres_ext.h
 
 CMakeFiles/softracker.dir/proto.c.o: ../cJSON.h
 CMakeFiles/softracker.dir/proto.c.o: ../proto.c

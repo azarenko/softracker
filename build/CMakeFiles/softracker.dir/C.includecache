@@ -77,6 +77,8 @@ evhttp.h
 -
 event2/bufferevent.h
 -
+libpq-fe.h
+-
 cmdparam.h
 /home/user/projects/softracker/cmdparam.h
 settings.h
@@ -127,12 +129,32 @@ sys/stat.h
 -
 semaphore.h
 -
+pthread.h
+-
+time.h
+-
 proto.h
 /home/user/projects/softracker/proto.h
 settings.h
 /home/user/projects/softracker/settings.h
 
 /home/user/projects/softracker/proto.h
+sys/types.h
+-
+sys/socket.h
+-
+stdlib.h
+-
+stdio.h
+-
+unistd.h
+-
+syslog.h
+-
+libpq-fe.h
+-
+settings.h
+/home/user/projects/softracker/settings.h
 cJSON.h
 /home/user/projects/softracker/cJSON.h
 
