@@ -35,7 +35,7 @@ static void terminate(void)
     if (event_loopbreak()) 
     {
 		syslog(LOG_ERR, "Error shutting down server");
-	}
+    }
 }
 
 /*
@@ -179,9 +179,7 @@ int httpserver_start(int port, int nthreads, int backlog)
 }
 
 int main(int argc, char **argv)
-{
-    srand(time(NULL));
-    
+{    
     setlocale(LC_ALL, "UTF-8");
     /*
      * init syslog
@@ -218,6 +216,8 @@ int main(int argc, char **argv)
 	sigaction(SIGHUP, &siginfo, NULL);
 	sigaction(SIGTERM, &siginfo, NULL);
     
+    pthread_mutex_init(&connectionm, NULL);
+	
     connections = (PGconn**)malloc(sizeof(PGconn*) * CONNECTION_BACKLOG);
     selectconnectionlock = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * CONNECTION_BACKLOG);
     

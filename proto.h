@@ -12,6 +12,7 @@
 const PGconn** connections;
 pthread_mutex_t* selectconnectionlock;
 unsigned long long int connectionIndex;
+pthread_mutex_t connectionm;
 
 typedef struct DevicePoint
 {

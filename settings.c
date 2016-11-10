@@ -146,6 +146,15 @@ int readSettings(const char* configFilePath)
         fprintf(stderr, "No 'transferport' setting in configuration file.\n");
         return(EXIT_FAILURE); 
     }
+    
+    if(CONNECTION_BACKLOG <= 0)
+    {
+      CONNECTION_BACKLOG = 1;
+    }
+    if(CONNECTION_BACKLOG > 100)
+    {
+      CONNECTION_BACKLOG = 100;
+    }
             
     return EXIT_SUCCESS;
 }

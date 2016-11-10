@@ -227,6 +227,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
 
 int db_login(PGconn **conn)
 {    
+    pthread_mutex_lock(&connectionm);
     if (PQstatus(*conn) == CONNECTION_BAD) 
     {
         char *pgoptions=NULL, *pgtty=NULL;
@@ -242,13 +243,15 @@ int db_login(PGconn **conn)
             { 
                 if(debug>1)syslog(LOG_ERR,"Connection to database failed %s", PQerrorMessage(*conn));
                 PQfinish(*conn);
+		pthread_mutex_unlock(&connectionm);
                 return 0;
             }
-        }        
-        return 1;
+        }       
+        pthread_mutex_unlock(&connectionm);
     }
     else
     {
+	pthread_mutex_unlock(&connectionm);
         return 1;
     }
 }
