@@ -32,9 +32,9 @@
 #define INITPACKETLEN 17
 #define SERIALIZESENSORLEN 2048
 
-#define DECL  "DECLARE mycursor CURSOR FOR "
-#define FETCH "FETCH ALL in mycursor"
-#define CLOSE "CLOSE mycursor"
+#define DECL  "DECLARE cursor%u CURSOR FOR "
+#define FETCH "FETCH ALL in cursor%u"
+#define CLOSE "CLOSE cursor%u"
 
 int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, unsigned short client_port)
 {
@@ -317,9 +317,17 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     PQclear(res);
     if(debug>1)syslog(LOG_ERR,"BEGIN ok");
 
-    sqllen=strlen(DECL);              sqllen+=strlen(sql);
-    sqlfull=(char*)malloc(sqllen+1);  memset(sqlfull, 0x00, sqllen+1);
-    strcpy(sqlfull, DECL);            strncat(sqlfull, sql, strlen(sql)); 
+    char request[MAXLENQUERY];
+    bzero(request, MAXLENQUERY);    
+    sprintf(request, DECL, conn);
+    
+    sqllen=strlen(request);              
+    sqllen+=strlen(sql);
+    sqlfull=(char*)malloc(sqllen+1);  
+    memset(sqlfull, 0x00, sqllen+1);
+    strcpy(sqlfull, request);            
+    strncat(sqlfull, sql, strlen(sql)); 
+    
     if(debug>3)syslog(LOG_ERR,"%s",sqlfull);
     res = PQexec(conn, sqlfull);
     if (!res || PQresultStatus(res) != PGRES_COMMAND_OK){
@@ -331,7 +339,10 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     free(sqlfull);
     if(debug>1)syslog(LOG_ERR,"DECLARE ok");
 
-    res = PQexec(conn, FETCH);
+    bzero(request, MAXLENQUERY);
+    sprintf(request, FETCH, conn);
+    
+    res = PQexec(conn, request);
     if (!res || PQresultStatus(res) != PGRES_TUPLES_OK){
         if(debug)syslog(LOG_ERR,"FETCH failed");
         PQclear(res);
@@ -348,8 +359,12 @@ void clearres(PGconn *conn, PGresult *res)
         return;
     }
     
+    char request[MAXLENQUERY];
+    bzero(request, MAXLENQUERY);    
+    sprintf(request, CLOSE, conn);
+    
     PQclear(res);
-    res = PQexec(conn, CLOSE);
+    res = PQexec(conn, request);
     if(debug>1)syslog(LOG_ERR,"CLOSE ok");
     PQclear(res);
     res = PQexec(conn, "COMMIT");
