@@ -312,7 +312,7 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     if (!res || PQresultStatus(res) != PGRES_COMMAND_OK){ 
             if(debug)syslog(LOG_ERR,"BEGIN failed");
             PQclear(res);
-            return res;
+            return NULL;
     }
     PQclear(res);
     if(debug>1)syslog(LOG_ERR,"BEGIN ok");
@@ -333,7 +333,7 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     if (!res || PQresultStatus(res) != PGRES_COMMAND_OK){
         if(debug)syslog(LOG_ERR,"DECLARE failed");
         PQclear(res);
-        return res;
+        return NULL;
     }
     PQclear(res);
     free(sqlfull);
@@ -346,7 +346,7 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     if (!res || PQresultStatus(res) != PGRES_TUPLES_OK){
         if(debug)syslog(LOG_ERR,"FETCH failed");
         PQclear(res);
-        return res;
+        return NULL;
     }
     if(debug>1)syslog(LOG_ERR,"FETCH ok");
     return res;
@@ -358,12 +358,16 @@ void clearres(PGconn *conn, PGresult *res)
     {
         return;
     }
-    
+
+    if(res)
+    {
+    	PQclear(res);
+    }    
+
     char request[MAXLENQUERY];
     bzero(request, MAXLENQUERY);    
     sprintf(request, CLOSE, conn);
     
-    PQclear(res);
     res = PQexec(conn, request);
     if(debug>1)syslog(LOG_ERR,"CLOSE ok");
     PQclear(res);
