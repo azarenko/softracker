@@ -20,7 +20,13 @@ int readSettings(const char* configFilePath)
         fprintf(stderr, "No 'CONNECTION_BACKLOG' setting in configuration file.\n");
         return(EXIT_FAILURE); 
     }
-    
+
+    if(!config_lookup_string(&cfg, "addr", &addr))        
+    {
+        fprintf(stderr, "No 'addr' setting in configuration file.\n");
+        return(EXIT_FAILURE); 
+    }    
+
     if(!config_lookup_int(&cfg, "port", &port))        
     {
         fprintf(stderr, "No 'port' setting in configuration file.\n");
@@ -144,6 +150,12 @@ int readSettings(const char* configFilePath)
     if(!config_lookup_int(&cfg, "transferport", &transferport))        
     {
         fprintf(stderr, "No 'transferport' setting in configuration file.\n");
+        return(EXIT_FAILURE); 
+    }
+
+    if(!config_lookup_int(&cfg, "daemon", &daemon))        
+    {
+        fprintf(stderr, "No 'daemon' setting in configuration file.\n");
         return(EXIT_FAILURE); 
     }
     

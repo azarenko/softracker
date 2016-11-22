@@ -58,7 +58,7 @@ static void sighandler(int signal) {
     }
 }
 
-int httpserver_bindsocket(int port, int backlog) {
+int httpserver_bindsocket(char* host, int port, int backlog) {
   int r;
   int nfd;
   nfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -70,7 +70,7 @@ int httpserver_bindsocket(int port, int backlog) {
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.sin_addr.s_addr = inet_addr(host);
   addr.sin_port = htons(port);
  
   r = bind(nfd, (struct sockaddr*)&addr, sizeof(addr));
@@ -156,10 +156,10 @@ void httpserver_GenericHandler(struct evhttp_request *req, void *arg) {
     httpserver_ProcessRequest(req);
 }
  
-int httpserver_start(int port, int nthreads, int backlog) 
+int httpserver_start(char* host, int port, int nthreads, int backlog) 
 {
   int r, i;
-  int nfd = httpserver_bindsocket(port, backlog);
+  int nfd = httpserver_bindsocket(host, port, backlog);
   if (nfd < 0) return -1;
   pthread_t ths[nthreads];
   for (i = 0; i < nthreads; i++) {
@@ -204,6 +204,11 @@ int main(int argc, char **argv)
         syslog(LOG_ERR, "Configuration file error.");
         goto exit;
     }
+
+    if(daemon == 1)
+    {
+	 daemon(1, 1);
+    }
     
     /* Set signal handlers */
 	sigset_t sigset;
@@ -229,7 +234,7 @@ int main(int argc, char **argv)
         pthread_mutex_init(&selectconnectionlock[i], NULL);
     }
     
-    if(httpserver_start(port, CONNECTION_BACKLOG, CONNECTION_BACKLOG) == -1)
+    if(httpserver_start(addr, port, CONNECTION_BACKLOG, CONNECTION_BACKLOG) == -1)
     {
         syslog(LOG_ERR, "Failed to start server");
         goto exit;

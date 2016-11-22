@@ -11,6 +11,9 @@ int CONNECTION_BACKLOG;
 // configuration file path
 const char* configFilePath;
 
+// my address 
+const char* addr;
+
 // my port
 int port;
 
@@ -99,5 +102,7 @@ const char* secondaryssl;
 // transfring simple data to
 const char* transferaddr;
 int transferport;
+
+int daemon;
 
 int readSettings(const char* configFilePath);
