@@ -205,7 +205,7 @@ int main(int argc, char **argv)
         goto exit;
     }
 
-    if(daemon == 1)
+    if(isdaemon == 1)
     {
 	 daemon(1, 1);
     }
