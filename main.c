@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
     if(isdaemon == 1)
     {
-	 daemon(1, 1);
+	 daemon(1, 0);
     }
     
     /* Set signal handlers */
