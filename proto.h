@@ -21,11 +21,11 @@ typedef struct DevicePoint
     long int datetime_ts;
     double latitude;
     double longitude;
-    int altitude;
-    int speed;
-    int course;
-    int accuracy;
-    int nsat;
+    short altitude;
+    short speed;
+    short course;
+    short accuracy;
+    short nsat;
     long int lastupdate_ts;
     char* gprs;
     char* wifi;
