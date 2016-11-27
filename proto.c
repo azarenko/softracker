@@ -36,6 +36,16 @@
 #define FETCH "FETCH ALL in cursor%u"
 #define CLOSE "CLOSE cursor%u"
 
+/**
+ * @brief ...
+ * 
+ * @param reqdata ...
+ * @param len ...
+ * @param outPacketId ...
+ * @param client_ip ...
+ * @param client_port ...
+ * @return int
+ */
 int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, unsigned short client_port)
 {
     cJSON *root = cJSON_Parse(reqdata);
@@ -43,19 +53,19 @@ int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, uns
     cJSON *id = cJSON_GetObjectItem(root, "id");
     if(id == NULL)
     {
-        return EXIT_FAILURE;
+        return 415;
     }
     *outPacketId = id->valuestring;
     
     cJSON *data = cJSON_GetObjectItem(root, "data");
     if(data == NULL)
     {
-        return EXIT_FAILURE;
+        return 415;
     }
     
     if(data->type != cJSON_Array && data->type != cJSON_String)
     {
-        return EXIT_FAILURE;
+        return 415;
     }
     
     if(data->type == cJSON_String)
@@ -71,16 +81,25 @@ int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, uns
         for(i = 0; i < length; i++)
         {
             cJSON * subitem = cJSON_GetArrayItem(data, i);
-            if(parsepoint(subitem, client_ip, client_port) == EXIT_FAILURE)
+	    int status = parsepoint(subitem, client_ip, client_port);
+            if(status != 200)
             {
-                return EXIT_FAILURE;
+                return status;
             }
         }
     }
     
-    return EXIT_SUCCESS;
+    return 200;
 }
 
+/**
+ * @brief ...
+ * 
+ * @param point ...
+ * @param client_ip ...
+ * @param client_port ...
+ * @return int
+ */
 int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
 {
     DevicePoint dp;
@@ -91,21 +110,21 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* device_id = cJSON_GetObjectItem(point, "device_id");
         if(device_id == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.device_id = device_id->valuestring;
         
         cJSON* name = cJSON_GetObjectItem(point, "name");
         if(name == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.name = name->valuestring;
         
         cJSON* datetime_ts = cJSON_GetObjectItem(point, "datetime_ts");
         if(datetime_ts == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         if(datetime_ts->type == cJSON_String)
         {
@@ -119,56 +138,56 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* latitude = cJSON_GetObjectItem(point, "latitude");
         if(latitude == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.latitude = latitude->valuedouble;
         
         cJSON* longitude = cJSON_GetObjectItem(point, "longitude");
         if(longitude == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.longitude = longitude->valuedouble;
         
         cJSON* altitude = cJSON_GetObjectItem(point, "altitude");
         if(altitude == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.altitude = altitude->valueint;
         
         cJSON* speed = cJSON_GetObjectItem(point, "speed");
         if(speed == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.speed = speed->valueint;
         
         cJSON* course = cJSON_GetObjectItem(point, "course");
         if(course == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.course = course->valueint;
         
         cJSON* accuracy = cJSON_GetObjectItem(point, "accuracy");
         if(accuracy == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.accuracy = accuracy->valueint;
         
         cJSON* nsat = cJSON_GetObjectItem(point, "nsat");
         if(nsat == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.nsat = nsat->valueint;
         
         cJSON* lastupdate_ts = cJSON_GetObjectItem(point, "lastupdate_ts");
         if(lastupdate_ts == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         if(lastupdate_ts->type == cJSON_String)
         {
@@ -183,35 +202,35 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* gprs = cJSON_GetObjectItem(device_info, "gprs");
         if(gprs == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.gprs = gprs->valuestring;
         
         cJSON* wifi = cJSON_GetObjectItem(device_info, "wifi");
         if(wifi == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.wifi = wifi->valuestring;
         
         cJSON* connected = cJSON_GetObjectItem(device_info, "connected");
         if(connected == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.connected = connected->valuestring;
         
         cJSON* battary = cJSON_GetObjectItem(device_info, "battary");
         if(battary == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         dp.battary = battary->valuestring;
         
         cJSON* lastcharge_ts = cJSON_GetObjectItem(device_info, "lastcharge_ts");
         if(lastcharge_ts == NULL)
         {
-            return EXIT_FAILURE;
+            return 415;
         }
         if(lastupdate_ts->type == cJSON_String)
         {
@@ -225,6 +244,12 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         return savepoint(&dp);
 }
 
+/**
+ * @brief ...
+ * 
+ * @param conn ...
+ * @return int
+ */
 int db_login(PGconn **conn)
 {    
     pthread_mutex_lock(&connectionm);
@@ -256,6 +281,14 @@ int db_login(PGconn **conn)
     }
 }
 
+/**
+ * @brief ...
+ * 
+ * @param conn ...
+ * @param sql ...
+ * @param report ...
+ * @return int
+ */
 int execsql(PGconn *conn, char *sql, char *report)
 {
     if (PQstatus(conn) == CONNECTION_BAD) 
@@ -297,6 +330,13 @@ int execsql(PGconn *conn, char *sql, char *report)
     return (0); 
 }
 
+/**
+ * @brief ...
+ * 
+ * @param conn ...
+ * @param sql ...
+ * @return PGresult*
+ */
 PGresult *getexecsql(PGconn *conn, char * sql)
 {   
     if (PQstatus(conn) == CONNECTION_BAD) 
@@ -352,6 +392,13 @@ PGresult *getexecsql(PGconn *conn, char * sql)
     return res;
 }
 
+/**
+ * @brief ...
+ * 
+ * @param conn ...
+ * @param res ...
+ * @return void
+ */
 void clearres(PGconn *conn, PGresult *res)
 {
     if (PQstatus(conn) == CONNECTION_BAD) 
@@ -376,6 +423,12 @@ void clearres(PGconn *conn, PGresult *res)
     PQclear(res);    
 } 
 
+/**
+ * @brief ...
+ * 
+ * @param dp ...
+ * @return int
+ */
 int savepoint(DevicePoint *dp)
 {
     int ret, num, ifexit;
@@ -393,7 +446,7 @@ int savepoint(DevicePoint *dp)
         if(db_login(&conn) == 0)
         {
             pthread_mutex_unlock(&selectconnectionlock[connectionId]);
-            return EXIT_FAILURE;
+            return 500;
         }
     }
     
@@ -410,20 +463,20 @@ int savepoint(DevicePoint *dp)
             sprintf(id,"0");
             ifexit=1;
             if(debug>1)syslog(LOG_ERR,"getexec sql id not found %s", dp->device_id);
-            } 
-            else 
-            {
-                ret = sprintf(id,"%s",PQgetvalue(res, 0, 0));
-                ifexit=0;
-                if(debug>1)syslog(LOG_ERR,"getexec sql found id=%s",id);
-            }         
+        } 
+        else 
+        {
+            ret = sprintf(id,"%s",PQgetvalue(res, 0, 0));
+            ifexit=0;
+            if(debug>1)syslog(LOG_ERR,"getexec sql found id=%s",id);
+        }         
     }
     clearres(conn, res);
     
     if(ifexit)
     {
         pthread_mutex_unlock(&selectconnectionlock[connectionId]);
-        return EXIT_FAILURE;
+        return 401;
     }
     
     bzero(query,MAXLENQUERY);
@@ -465,20 +518,23 @@ int savepoint(DevicePoint *dp)
 
     if(debug)syslog(LOG_ERR,"query: %s",query);
         
+    int status = 200;
     res = getexecsql(conn, query);
     if(res)
     {
         if (PQgetisnull(res,0,0))
         {
-                if(debug)syslog(LOG_WARNING,"can't insert track record errno %d",ret);
-                if(debug>1)syslog(LOG_WARNING,"%s",query);
-        }
-        else 
-        {            
-        }         
+          if(debug)syslog(LOG_WARNING,"can't insert track record errno %d",ret);
+          if(debug>1)syslog(LOG_WARNING,"%s",query);
+	  status = 500;		
+        }              
+    }
+    else
+    {
+	status = 500;
     }
     clearres(conn, res); 
     
     pthread_mutex_unlock(&selectconnectionlock[connectionId]);
-    return EXIT_SUCCESS;
+    return status;
 }

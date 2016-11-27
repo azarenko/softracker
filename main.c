@@ -38,8 +38,11 @@ static void terminate(void)
     }
 }
 
-/*
- * Heandling signal
+/**
+ * @brief ...
+ * 
+ * @param signal ...
+ * @return void
  */
 static void sighandler(int signal) {
     switch(signal)
@@ -58,6 +61,14 @@ static void sighandler(int signal) {
     }
 }
 
+/**
+ * @brief ...
+ * 
+ * @param host ...
+ * @param port ...
+ * @param backlog ...
+ * @return int
+ */
 int httpserver_bindsocket(char* host, int port, int backlog) {
   int r;
   int nfd;
@@ -86,12 +97,24 @@ int httpserver_bindsocket(char* host, int port, int backlog) {
   return nfd;
 }
  
+ /**
+  * @brief ...
+  * 
+  * @param arg ...
+  * @return void*
+  */
 void* httpserver_Dispatch(void *arg) {
   event_base_dispatch((struct event_base*)arg);
   return NULL;
 }
  
-void httpserver_ProcessRequest(struct evhttp_request *req) {
+ /**
+  * @brief ...
+  * 
+  * @param req ...
+  * @return void
+  */
+ void httpserver_ProcessRequest(struct evhttp_request *req) {
     
     struct evbuffer *inbuff;    
     char content[MAX_CONTENT_LEN];
@@ -111,25 +134,46 @@ void httpserver_ProcessRequest(struct evhttp_request *req) {
     unsigned short client_port;
 
     evhttp_connection_get_peer(evhttp_request_get_connection(req), &client_ip, &client_port);
-    
-    int isgood = contentLen > 0;    
-    isgood = proto(content, contentLen, &outPacketId, client_ip, client_port) == EXIT_SUCCESS;        
-    
-    if(isgood)
-    {
-         evbuffer_add_printf(outbuff,
-            "{\"id\":\"%s\",\n"
-            "\"error_code\":\"0\",\n"
-            "\"error_message\":\"\"}", outPacketId);
-    }
-    else
-    {
-           evbuffer_add_printf(outbuff,
-            "{\"id\":\"%s\",\n"
-            "\"error_code\":\"103\",\n"
-            "\"error_message\":\"failed to parse data\"}", outPacketId);  
-    }
         
+    int statuscode = proto(content, contentLen, &outPacketId, client_ip, client_port);        
+    
+    char* jsonmessage;
+    char* protocolmessage;
+    int jsonstatuscode;
+    
+    switch(statuscode)
+    {
+      case 200:
+	jsonstatuscode = 0;
+	jsonmessage = "";
+	protocolmessage = "OK";
+	break;
+	
+      case 401:
+	jsonstatuscode = 103;
+	jsonmessage = "unauthorized";
+	protocolmessage = "ERROR";
+	break;
+	
+      case 415:
+	jsonstatuscode = 103;
+	jsonmessage = "invalid json data";
+	protocolmessage = "ERROR";
+	break;
+	
+      case 500:
+      default:
+	jsonstatuscode = 103;
+	jsonmessage = "unhandled internal server error";
+	protocolmessage = "ERROR";
+	break;	
+    }
+    
+    evbuffer_add_printf(outbuff,
+            "{\"id\":\"%s\",\n"
+            "\"error_code\":\"%d\",\n"
+            "\"error_message\":\"%s\"}", outPacketId, jsonstatuscode, jsonmessage);
+          
     char outcontentLengthStr[3];
     sprintf(outcontentLengthStr, "%zu", evbuffer_get_length(outbuff));
     
@@ -139,24 +183,33 @@ void httpserver_ProcessRequest(struct evhttp_request *req) {
     evhttp_add_header(req->output_headers, "Content-Length", outcontentLengthStr);
 
     // Send reply
-    if(isgood)
-    {
-        evhttp_send_reply(req, HTTP_OK, "OK", outbuff);
-    }
-    else
-    {
-        evhttp_send_reply(req, HTTP_INTERNAL, "ERROR", outbuff);
-    }
+    evhttp_send_reply(req, statuscode, protocolmessage, outbuff);
 
     // Free memory
     evbuffer_free(outbuff);    
 }
  
-void httpserver_GenericHandler(struct evhttp_request *req, void *arg) {
+ /**
+  * @brief ...
+  * 
+  * @param req ...
+  * @param arg ...
+  * @return void
+  */
+ void httpserver_GenericHandler(struct evhttp_request *req, void *arg) {
     httpserver_ProcessRequest(req);
 }
  
-int httpserver_start(char* host, int port, int nthreads, int backlog) 
+ /**
+  * @brief ...
+  * 
+  * @param host ...
+  * @param port ...
+  * @param nthreads ...
+  * @param backlog ...
+  * @return int
+  */
+ int httpserver_start(char* host, int port, int nthreads, int backlog) 
 {
   int r, i;
   int nfd = httpserver_bindsocket(host, port, backlog);
@@ -178,6 +231,13 @@ int httpserver_start(char* host, int port, int nthreads, int backlog)
   }
 }
 
+/**
+ * @brief ...
+ * 
+ * @param argc ...
+ * @param argv ...
+ * @return int
+ */
 int main(int argc, char **argv)
 {    
     setlocale(LC_ALL, "UTF-8");
