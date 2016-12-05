@@ -272,7 +272,7 @@ int main(int argc, char **argv)
 
     /* Create pid file */
 
-    FILE* pidf = fopen(argv[2], "w");
+    FILE* pidf = fopen(pidfile, "w");
 
     if(pidf==NULL)
     {
