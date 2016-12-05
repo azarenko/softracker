@@ -263,13 +263,26 @@ int main(int argc, char **argv)
     {
         syslog(LOG_ERR, "Configuration file error.");
         goto exit;
-    }
+    }    
 
     if(isdaemon == 1)
     {
-	 daemon(1, 0);
+	 daemon(1, 0);	 
     }
-    
+
+    /* Create pid file */
+
+    FILE* pidf = fopen(argv[2], "w");
+
+    if(pidf==NULL)
+    {
+        syslog(LOG_ERR, "Failed to write pid file");
+    }
+
+    fprintf(pidf, "%d", getpid());
+
+    fclose(pidf);    
+
     /* Set signal handlers */
 	sigset_t sigset;
 	sigemptyset(&sigset);
