@@ -159,6 +159,12 @@ int readSettings(const char* configFilePath)
         return(EXIT_FAILURE); 
     }
     
+    if(!config_lookup_string(&cfg, "pidfile", &pidfile))        
+    {
+        fprintf(stderr, "No 'pidfile' setting in configuration file.\n");
+        return(EXIT_FAILURE); 
+    }
+    
     if(CONNECTION_BACKLOG <= 0)
     {
       CONNECTION_BACKLOG = 1;
