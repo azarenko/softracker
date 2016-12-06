@@ -8,7 +8,7 @@ ProjectRootRelative=./
 
 [CMake][CMake Build Directory 0]
 Build Directory Path=/home/user/projects/softracker/build
-Build Type=Debug
+Build Type=
 CMake Binary=file:///usr/bin/cmake
 Environment Profile=
 Extra Arguments=
@@ -29,7 +29,7 @@ Name=softracker
 Type=Native Application
 
 [Launch][Launch Configuration 0][Data]
-Arguments=-f /etc/softracker.conf
+Arguments=-f /home/user/projects/softracker/softracker.conf
 Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x02\x00\x00\x00\x14\x00s\x00o\x00f\x00t\x00r\x00a\x00c\x00k\x00e\x00r\x00\x00\x00\x14\x00s\x00o\x00f\x00t\x00r\x00a\x00c\x00k\x00e\x00r)
 Dependency Action=Build
 EnvironmentGroup=
