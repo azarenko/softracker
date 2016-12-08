@@ -140,30 +140,35 @@ void* httpserver_Dispatch(void *arg) {
     char* jsonmessage;
     char* protocolmessage;
     int jsonstatuscode;
+    int protostatuscode;
     
     switch(statuscode)
     {
       case 200:
-	jsonstatuscode = 0;
+	jsonstatuscode = 200;
+	protostatuscode = 200;
 	jsonmessage = "";
 	protocolmessage = "OK";
 	break;
 	
       case 401:
-	jsonstatuscode = 103;
+	jsonstatuscode = 401;
+	protostatuscode = 200;
 	jsonmessage = "unauthorized";
 	protocolmessage = "ERROR";
 	break;
 	
       case 415:
-	jsonstatuscode = 103;
+	jsonstatuscode = 415;
+	protostatuscode = 200;
 	jsonmessage = "invalid json data";
 	protocolmessage = "ERROR";
 	break;
 	
       case 500:
       default:
-	jsonstatuscode = 103;
+	jsonstatuscode = 500;
+	protostatuscode = 500;
 	jsonmessage = "unhandled internal server error";
 	protocolmessage = "ERROR";
 	break;	
@@ -183,7 +188,7 @@ void* httpserver_Dispatch(void *arg) {
     evhttp_add_header(req->output_headers, "Content-Length", outcontentLengthStr);
 
     // Send reply
-    evhttp_send_reply(req, statuscode, protocolmessage, outbuff);
+    evhttp_send_reply(req, protostatuscode, protocolmessage, outbuff);
 
     // Free memory
     evbuffer_free(outbuff);    
