@@ -249,7 +249,7 @@ int main(int argc, char **argv)
     /*
      * init syslog
      */
-    openlog(argv[0], 0, LOG_USER);
+    openlog("softtracker", 0, LOG_USER);
     syslog(LOG_INFO, "Starting.");
     
     /*
