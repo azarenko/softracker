@@ -7,6 +7,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#define _GNU_SOURCE
 #include <errno.h>
 #include <err.h>
 #include <event.h>
@@ -249,7 +250,7 @@ int main(int argc, char **argv)
     /*
      * init syslog
      */
-    openlog("softtracker", 0, LOG_USER);
+    openlog(program_invocation_short_name, 0, LOG_USER);
     syslog(LOG_INFO, "Starting.");
     
     /*
