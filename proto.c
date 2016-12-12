@@ -53,6 +53,7 @@ int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, uns
     cJSON *id = cJSON_GetObjectItem(root, "id");
     if(id == NULL)
     {
+        syslog(LOG_ERR, "Error persing id");
         return 415;
     }
     *outPacketId = id->valuestring;
@@ -60,11 +61,13 @@ int proto(char* reqdata, int len, const char** outPacketId, char *client_ip, uns
     cJSON *data = cJSON_GetObjectItem(root, "data");
     if(data == NULL)
     {
+        syslog(LOG_ERR, "Error persing data");
         return 415;
     }
     
     if(data->type != cJSON_Array && data->type != cJSON_String)
     {
+        syslog(LOG_ERR, "Error persing type of data member");
         return 415;
     }
     
@@ -110,6 +113,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* device_id = cJSON_GetObjectItem(point, "device_id");
         if(device_id == NULL)
         {
+	    syslog(LOG_ERR, "Error persing device_id");
             return 415;
         }
         dp.device_id = device_id->valuestring;
@@ -117,6 +121,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* name = cJSON_GetObjectItem(point, "name");
         if(name == NULL)
         {
+	    syslog(LOG_ERR, "Error persing name");
             return 415;
         }
         dp.name = name->valuestring;
@@ -124,6 +129,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* datetime_ts = cJSON_GetObjectItem(point, "datetime_ts");
         if(datetime_ts == NULL)
         {
+	    syslog(LOG_ERR, "Error persing datetime_ts");
             return 415;
         }
         if(datetime_ts->type == cJSON_String)
@@ -138,6 +144,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* latitude = cJSON_GetObjectItem(point, "latitude");
         if(latitude == NULL)
         {
+	  syslog(LOG_ERR, "Error persing latitude");
             return 415;
         }
         dp.latitude = latitude->valuedouble;
@@ -145,6 +152,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* longitude = cJSON_GetObjectItem(point, "longitude");
         if(longitude == NULL)
         {
+	  syslog(LOG_ERR, "Error persing longitude");
             return 415;
         }
         dp.longitude = longitude->valuedouble;
@@ -152,6 +160,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* altitude = cJSON_GetObjectItem(point, "altitude");
         if(altitude == NULL)
         {
+	  syslog(LOG_ERR, "Error persing altitude");
             return 415;
         }
         dp.altitude = altitude->valueint;
@@ -159,6 +168,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* speed = cJSON_GetObjectItem(point, "speed");
         if(speed == NULL)
         {
+	  syslog(LOG_ERR, "Error persing speed");
             return 415;
         }
         dp.speed = speed->valueint;
@@ -166,6 +176,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* course = cJSON_GetObjectItem(point, "course");
         if(course == NULL)
         {
+	  syslog(LOG_ERR, "Error persing course");
             return 415;
         }
         dp.course = course->valueint;
@@ -173,6 +184,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* accuracy = cJSON_GetObjectItem(point, "accuracy");
         if(accuracy == NULL)
         {
+	  syslog(LOG_ERR, "Error persing accuracy");
             return 415;
         }
         dp.accuracy = accuracy->valueint;
@@ -180,6 +192,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* nsat = cJSON_GetObjectItem(point, "nsat");
         if(nsat == NULL)
         {
+	   syslog(LOG_ERR, "Error persing nsat");
             return 415;
         }
         dp.nsat = nsat->valueint;
@@ -187,6 +200,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* lastupdate_ts = cJSON_GetObjectItem(point, "lastupdate_ts");
         if(lastupdate_ts == NULL)
         {
+	   syslog(LOG_ERR, "Error persing lastupdate_ts");
             return 415;
         }
         if(lastupdate_ts->type == cJSON_String)
@@ -199,9 +213,15 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         }
         
         cJSON* device_info = cJSON_GetObjectItem(point, "device_info");
+	if(device_info == NULL)
+        {
+	  syslog(LOG_ERR, "Error persing device_info");
+            return 415;
+        }
         cJSON* gprs = cJSON_GetObjectItem(device_info, "gprs");
         if(gprs == NULL)
         {
+	  syslog(LOG_ERR, "Error persing gprs");
             return 415;
         }
         dp.gprs = gprs->valuestring;
@@ -209,6 +229,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* wifi = cJSON_GetObjectItem(device_info, "wifi");
         if(wifi == NULL)
         {
+	  syslog(LOG_ERR, "Error persing wifi");
             return 415;
         }
         dp.wifi = wifi->valuestring;
@@ -216,6 +237,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* connected = cJSON_GetObjectItem(device_info, "connected");
         if(connected == NULL)
         {
+	  syslog(LOG_ERR, "Error persing connected");
             return 415;
         }
         dp.connected = connected->valuestring;
@@ -223,6 +245,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* battary = cJSON_GetObjectItem(device_info, "battary");
         if(battary == NULL)
         {
+	  syslog(LOG_ERR, "Error persing battary");
             return 415;
         }
         dp.battary = battary->valuestring;
@@ -230,6 +253,7 @@ int parsepoint(cJSON* point, char *client_ip, unsigned short client_port)
         cJSON* lastcharge_ts = cJSON_GetObjectItem(device_info, "lastcharge_ts");
         if(lastcharge_ts == NULL)
         {
+	  syslog(LOG_ERR, "Error persing lastcharge_ts");
             return 415;
         }
         if(lastupdate_ts->type == cJSON_String)

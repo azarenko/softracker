@@ -165,6 +165,7 @@ void* httpserver_Dispatch(void *arg) {
 	protostatuscode = 200;
 	jsonmessage = "invalid json data";
 	protocolmessage = "ERROR";
+	syslog(LOG_ERR, "Error persing JSON -> %s", content);
 	break;
 	
       case 500:
@@ -173,6 +174,7 @@ void* httpserver_Dispatch(void *arg) {
 	protostatuscode = 500;
 	jsonmessage = "unhandled internal server error";
 	protocolmessage = "ERROR";
+	syslog(LOG_ERR, "Internal errorgit JSON -> %s", content);
 	break;	
     }
     
