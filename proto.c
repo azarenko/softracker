@@ -514,7 +514,7 @@ int savepoint(DevicePoint *dp)
     %d::real,\
     %d::integer,\
     %d::smallint,\
-    0::smallint,\
+    %d::smallint,\
     %d::smallint,\
     %d::smallint,\
     %s::smallint,\
@@ -532,6 +532,7 @@ int savepoint(DevicePoint *dp)
                  dp->speed, 
                  0,
                  dp->altitude,
+		 dp->course,
                  dp->nsat, 
                  dp->accuracy,
                  dp->gprs,
